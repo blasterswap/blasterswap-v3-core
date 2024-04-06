@@ -52,7 +52,7 @@
     "compile": "hardhat compile",
     "size": "hardhat size-contracts",
     "deploy:blast": "hardhat deploy --network blast",
-    "deploy:sepolia": "hardhat deploy --network sepolia",
+    "deploy:sepolia": "hardhat deploy --network ethSepolia",
     "deploy:localhost": "hardhat deploy --network localhost"
   }
 }
