@@ -32,7 +32,7 @@ import "./interfaces/IERC20Rebasing.sol";
 import "./interfaces/IBlast.sol";
 import "./interfaces/IBlastPoints.sol";
 
-// INIT_CODE_HASH 0x11056fb142badfd47cb326d0b82cc1009163115a37f7a780a4a9df550dfd65d0
+// INIT_CODE_HASH 0xf416f3c4380a9775122ff9dab346d9c4fbbbf03dab3d58fd87ef27197fcc544f
 contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     using LowGasSafeMath for uint256;
     using LowGasSafeMath for int256;
@@ -104,16 +104,6 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     /// @inheritdoc IBlasterswapV3PoolState
     Oracle.Observation[65535] public override observations;
 
-    IERC20Rebasing private constant USDB =
-        IERC20Rebasing(0x4300000000000000000000000000000000000003);
-    IERC20Rebasing private constant WETH =
-        IERC20Rebasing(0x4300000000000000000000000000000000000004);
-
-    IBlast private constant BLAST =
-        IBlast(0x4300000000000000000000000000000000000002);
-    IBlastPoints private constant BLAST_POINTS =
-        IBlastPoints(0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800);
-
     /// @dev Mutually exclusive reentrancy protection into the pool to/from a method. This method also prevents entrance
     /// to a function before the pool is initialized. The reentrancy guard is required throughout the contract because
     /// we use balance checks to determine the payment status of interactions such as mint, swap and flash.
@@ -133,9 +123,6 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     constructor() {
         int24 _tickSpacing;
 
-        USDB.configure(YieldMode.CLAIMABLE);
-        WETH.configure(YieldMode.CLAIMABLE);
-
         address _factory;
         (
             _factory,
@@ -146,13 +133,6 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
         ) = IBlasterswapV3PoolDeployer(msg.sender).parameters();
         tickSpacing = _tickSpacing;
         factory = _factory;
-
-        BLAST.configureClaimableGas();
-        BLAST.configureGovernor(IBlasterswapV3Factory(_factory).admin());
-
-        BLAST_POINTS.configurePointsOperator(
-            IBlasterswapV3Factory(_factory).admin()
-        );
 
         maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
             _tickSpacing
@@ -522,37 +502,6 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
                 _feeGrowthGlobal1X128
             );
 
-        if (token0 == address(USDB) || token1 == address(USDB)) {
-            uint256 claimableAmount = USDB.getClaimableAmount(address(this));
-            uint256 amountClaimedUSDB = USDB.claim(
-                address(this),
-                claimableAmount
-            );
-
-            if (token0 == address(USDB)) {
-                feeGrowthGlobal0X128 += amountClaimedUSDB;
-            }
-
-            if (token1 == address(USDB)) {
-                feeGrowthGlobal1X128 += amountClaimedUSDB;
-            }
-        }
-
-        if (token0 == address(WETH) || token1 == address(WETH)) {
-            uint256 claimableAmount = WETH.getClaimableAmount(address(this));
-            uint256 amountClaimedWETH = WETH.claim(
-                address(this),
-                claimableAmount
-            );
-
-            if (token0 == address(WETH)) {
-                feeGrowthGlobal0X128 += amountClaimedWETH;
-            }
-
-            if (token1 == address(WETH)) {
-                feeGrowthGlobal1X128 += amountClaimedWETH;
-            }
-        }
         position.update(
             liquidityDelta,
             feeGrowthInside0X128,
