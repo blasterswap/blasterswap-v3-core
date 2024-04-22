@@ -15,9 +15,12 @@ import { resolve } from 'path';
 dotenvConfig({ path: resolve(__dirname, './.env') });
 
 const blastURI = process.env.BLAST_URI || '';
-const sepoliaURI = process.env.SEPOLIA_URI || '';
+const ethSepoliaURI = process.env.ETH_SEPOLIA_URI || '';
 const mnemonic = process.env.MNEMONIC || '';
 const localURI = 'http://localhost:8545';
+
+const blastScanAPIKey = process.env.ETHERSCAN_API_KEY_BLAST || '';
+const ethSepoliaScanAPIKey = process.env.ETHERSCAN_API_KEY_ETH_SEPOLIA || '';
 
 export default {
   networks: {
@@ -33,8 +36,8 @@ export default {
         mnemonic: mnemonic,
       },
     },
-    sepolia: {
-      url: sepoliaURI,
+    ethSepolia: {
+      url: ethSepoliaURI,
       accounts: {
         mnemonic: mnemonic,
       },
@@ -46,9 +49,20 @@ export default {
     }
   },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      sepolia: ethSepoliaScanAPIKey,
+      blast: blastScanAPIKey,
+    },
+    customChains: [
+      {
+        network: "blast",
+        chainId: 238,
+        urls: {
+          apiURL: "https://api.blastscan.io/api",
+          browserURL: "https://api.blastscan.io/api"
+        }
+      }
+    ]
   },
   solidity: {
     compilers: [{
