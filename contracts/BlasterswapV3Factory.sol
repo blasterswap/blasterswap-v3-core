@@ -4,6 +4,9 @@ pragma solidity =0.7.6;
 import "./interfaces/IBlasterswapV3Factory.sol";
 import "./interfaces/IBlast.sol";
 
+// import "./BlasterswapV3Pool.sol";
+// import "hardhat/console.sol";
+
 import "./BlasterswapV3PoolDeployer.sol";
 import "./NoDelegateCall.sol";
 
@@ -34,8 +37,16 @@ contract BlasterswapV3Factory is
         admin = _pointsAdmin;
         emit OwnerChanged(address(0), msg.sender);
 
-        BLAST.configureClaimableGas();
-        BLAST.configureGovernor(admin);
+        // BLAST.configureClaimableGas();
+        // BLAST.configureGovernor(admin);
+
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
+        // console.logBytes32(keccak256(type(BlasterswapV3Pool).creationCode));
 
         feeAmountTickSpacing[500] = 10;
         emit FeeAmountEnabled(500, 10);

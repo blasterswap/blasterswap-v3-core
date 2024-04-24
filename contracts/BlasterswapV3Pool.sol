@@ -32,7 +32,7 @@ import "./interfaces/IERC20Rebasing.sol";
 import "./interfaces/IBlast.sol";
 import "./interfaces/IBlastPoints.sol";
 
-// INIT_CODE_HASH 0x6c7188604b726a9913dfd875ad1912491aa27916135d8bdd032756e16fdd4c22
+// INIT_CODE_HASH 0xdc8d72f078dad1260b03ee2b33738de9b77f51fa6e4cf9b99fc7195aaf8d8290
 contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     using LowGasSafeMath for uint256;
     using LowGasSafeMath for int256;
@@ -133,8 +133,8 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     constructor() {
         int24 _tickSpacing;
 
-        USDB.configure(YieldMode.CLAIMABLE);
-        WETH.configure(YieldMode.CLAIMABLE);
+        // USDB.configure(YieldMode.CLAIMABLE);
+        // WETH.configure(YieldMode.CLAIMABLE);
 
         address _factory;
         (
@@ -147,12 +147,12 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
         tickSpacing = _tickSpacing;
         factory = _factory;
 
-        BLAST.configureClaimableGas();
-        BLAST.configureGovernor(IBlasterswapV3Factory(_factory).admin());
+        // BLAST.configureClaimableGas();
+        // BLAST.configureGovernor(IBlasterswapV3Factory(_factory).admin());
 
-        BLAST_POINTS.configurePointsOperator(
-            IBlasterswapV3Factory(_factory).admin()
-        );
+        // BLAST_POINTS.configurePointsOperator(
+        //     IBlasterswapV3Factory(_factory).admin()
+        // );
 
         maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
             _tickSpacing
@@ -460,57 +460,57 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     ) private returns (Position.Info storage position) {
         position = positions.get(owner, tickLower, tickUpper);
 
-        if (token0 == address(USDB) || token1 == address(USDB)) {
-            uint256 claimableAmount = USDB.getClaimableAmount(address(this));
-            uint256 amountClaimedUSDB = USDB.claim(
-                address(this),
-                claimableAmount
-            );
+        // if (token0 == address(USDB) || token1 == address(USDB)) {
+        //     uint256 claimableAmount = USDB.getClaimableAmount(address(this));
+        //     uint256 amountClaimedUSDB = USDB.claim(
+        //         address(this),
+        //         claimableAmount
+        //     );
 
-            if (liquidity > 0) {
-                if (token0 == address(USDB)) {
-                    feeGrowthGlobal0X128 += FullMath.mulDiv(
-                        amountClaimedUSDB,
-                        FixedPoint128.Q128,
-                        liquidity
-                    );
-                }
+        //     if (liquidity > 0) {
+        //         if (token0 == address(USDB)) {
+        //             feeGrowthGlobal0X128 += FullMath.mulDiv(
+        //                 amountClaimedUSDB,
+        //                 FixedPoint128.Q128,
+        //                 liquidity
+        //             );
+        //         }
 
-                if (token1 == address(USDB)) {
-                    feeGrowthGlobal1X128 += FullMath.mulDiv(
-                        amountClaimedUSDB,
-                        FixedPoint128.Q128,
-                        liquidity
-                    );
-                }
-            }
-        }
+        //         if (token1 == address(USDB)) {
+        //             feeGrowthGlobal1X128 += FullMath.mulDiv(
+        //                 amountClaimedUSDB,
+        //                 FixedPoint128.Q128,
+        //                 liquidity
+        //             );
+        //         }
+        //     }
+        // }
 
-        if (token0 == address(WETH) || token1 == address(WETH)) {
-            uint256 claimableAmount = WETH.getClaimableAmount(address(this));
-            uint256 amountClaimedWETH = WETH.claim(
-                address(this),
-                claimableAmount
-            );
+        // if (token0 == address(WETH) || token1 == address(WETH)) {
+        //     uint256 claimableAmount = WETH.getClaimableAmount(address(this));
+        //     uint256 amountClaimedWETH = WETH.claim(
+        //         address(this),
+        //         claimableAmount
+        //     );
 
-            if (liquidity > 0) {
-                if (token0 == address(WETH)) {
-                    feeGrowthGlobal0X128 += FullMath.mulDiv(
-                        amountClaimedWETH,
-                        FixedPoint128.Q128,
-                        liquidity
-                    );
-                }
+        //     if (liquidity > 0) {
+        //         if (token0 == address(WETH)) {
+        //             feeGrowthGlobal0X128 += FullMath.mulDiv(
+        //                 amountClaimedWETH,
+        //                 FixedPoint128.Q128,
+        //                 liquidity
+        //             );
+        //         }
 
-                if (token1 == address(WETH)) {
-                    feeGrowthGlobal1X128 += FullMath.mulDiv(
-                        amountClaimedWETH,
-                        FixedPoint128.Q128,
-                        liquidity
-                    );
-                }
-            }
-        }
+        //         if (token1 == address(WETH)) {
+        //             feeGrowthGlobal1X128 += FullMath.mulDiv(
+        //                 amountClaimedWETH,
+        //                 FixedPoint128.Q128,
+        //                 liquidity
+        //             );
+        //         }
+        //     }
+        // }
 
         uint256 _feeGrowthGlobal0X128 = feeGrowthGlobal0X128; // SLOAD for gas optimization
         uint256 _feeGrowthGlobal1X128 = feeGrowthGlobal1X128; // SLOAD for gas optimization
