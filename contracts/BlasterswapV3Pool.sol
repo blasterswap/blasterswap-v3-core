@@ -32,8 +32,7 @@ import "./interfaces/IERC20Rebasing.sol";
 import "./interfaces/IBlast.sol";
 import "./interfaces/IBlastPoints.sol";
 
-// TODO: UPDATE INIT_CODE_HASH
-// INIT_CODE_HASH 0x11056fb142badfd47cb326d0b82cc1009163115a37f7a780a4a9df550dfd65d0
+// INIT_CODE_HASH 0x6c7188604b726a9913dfd875ad1912491aa27916135d8bdd032756e16fdd4c22
 contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     using LowGasSafeMath for uint256;
     using LowGasSafeMath for int256;
@@ -461,13 +460,60 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     ) private returns (Position.Info storage position) {
         position = positions.get(owner, tickLower, tickUpper);
 
+        if (token0 == address(USDB) || token1 == address(USDB)) {
+            uint256 claimableAmount = USDB.getClaimableAmount(address(this));
+            uint256 amountClaimedUSDB = USDB.claim(
+                address(this),
+                claimableAmount
+            );
+
+            if (liquidity > 0) {
+                if (token0 == address(USDB)) {
+                    feeGrowthGlobal0X128 += FullMath.mulDiv(
+                        amountClaimedUSDB,
+                        FixedPoint128.Q128,
+                        liquidity
+                    );
+                }
+
+                if (token1 == address(USDB)) {
+                    feeGrowthGlobal1X128 += FullMath.mulDiv(
+                        amountClaimedUSDB,
+                        FixedPoint128.Q128,
+                        liquidity
+                    );
+                }
+            }
+        }
+
+        if (token0 == address(WETH) || token1 == address(WETH)) {
+            uint256 claimableAmount = WETH.getClaimableAmount(address(this));
+            uint256 amountClaimedWETH = WETH.claim(
+                address(this),
+                claimableAmount
+            );
+
+            if (liquidity > 0) {
+                if (token0 == address(WETH)) {
+                    feeGrowthGlobal0X128 += FullMath.mulDiv(
+                        amountClaimedWETH,
+                        FixedPoint128.Q128,
+                        liquidity
+                    );
+                }
+
+                if (token1 == address(WETH)) {
+                    feeGrowthGlobal1X128 += FullMath.mulDiv(
+                        amountClaimedWETH,
+                        FixedPoint128.Q128,
+                        liquidity
+                    );
+                }
+            }
+        }
+
         uint256 _feeGrowthGlobal0X128 = feeGrowthGlobal0X128; // SLOAD for gas optimization
         uint256 _feeGrowthGlobal1X128 = feeGrowthGlobal1X128; // SLOAD for gas optimization
-
-        (_feeGrowthGlobal0X128, _feeGrowthGlobal1X128) = claimYield(
-            _feeGrowthGlobal0X128,
-            _feeGrowthGlobal1X128
-        );
 
         // if we need to update the ticks, do it
         bool flippedLower;
@@ -1105,76 +1151,5 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
         }
 
         emit CollectProtocol(msg.sender, recipient, amount0, amount1);
-    }
-
-    function claimYield(
-        uint256 _feeGrowthGlobal0X128,
-        uint256 _feeGrowthGlobal1X128
-    )
-        internal
-        returns (
-            uint256 feeGrowthGlobal0X128WithYield,
-            uint256 feeGrowthGlobal1X128WithYield
-        )
-    {
-        if (token0 == address(USDB) || token1 == address(USDB)) {
-            uint256 claimableAmount = USDB.getClaimableAmount(address(this));
-            uint256 amountClaimedUSDB = USDB.claim(
-                address(this),
-                claimableAmount
-            );
-
-            if (liquidity > 0) {
-                if (token0 == address(USDB)) {
-                    feeGrowthGlobal0X128WithYield =
-                        _feeGrowthGlobal0X128 +
-                        FullMath.mulDiv(
-                            amountClaimedUSDB,
-                            FixedPoint128.Q128,
-                            liquidity
-                        );
-                }
-
-                if (token1 == address(USDB)) {
-                    feeGrowthGlobal1X128WithYield =
-                        _feeGrowthGlobal1X128 +
-                        FullMath.mulDiv(
-                            amountClaimedUSDB,
-                            FixedPoint128.Q128,
-                            liquidity
-                        );
-                }
-            }
-        }
-
-        if (token0 == address(WETH) || token1 == address(WETH)) {
-            uint256 claimableAmount = WETH.getClaimableAmount(address(this));
-            uint256 amountClaimedWETH = WETH.claim(
-                address(this),
-                claimableAmount
-            );
-
-            if (liquidity > 0) {
-                if (token0 == address(WETH)) {
-                    feeGrowthGlobal0X128WithYield =
-                        _feeGrowthGlobal0X128 +
-                        FullMath.mulDiv(
-                            amountClaimedWETH,
-                            FixedPoint128.Q128,
-                            liquidity
-                        );
-                }
-
-                if (token1 == address(WETH)) {
-                    feeGrowthGlobal1X128WithYield =
-                        _feeGrowthGlobal1X128 +
-                        FullMath.mulDiv(
-                            amountClaimedWETH,
-                            FixedPoint128.Q128,
-                            liquidity
-                        );
-                }
-            }
-        }
     }
 }
