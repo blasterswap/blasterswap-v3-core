@@ -1,9 +1,12 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { Wallet } from 'ethers';
 
 const ONE_BP_FEE = 100
 const ONE_BP_TICK_SPACING = 1
 
 const blastNetworkName = 'blast';
+
+const admin = "0x2AcF0a024a4Fd16E3A0CDDdB32FC229759290a1e"
 
 module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	const { deploy } = hre.deployments;
@@ -23,7 +26,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	console.log("Deploying factory...")
 	const v3CoreFactory = await deploy('BlasterswapV3Factory', {
 		from: deployer,
-		args: [deployer],
+		args: [admin],
 		log: true,
 		libraries: {
 			Oracle: oracleLibrary.address,

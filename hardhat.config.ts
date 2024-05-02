@@ -10,14 +10,14 @@ import 'hardhat-contract-sizer';
 import 'hardhat-deploy';
 import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';
-import ethers from 'ethers';
+import { Wallet } from 'ethers';
 
 
 dotenvConfig({ path: resolve(__dirname, './.env') });
 
 const BLAST_RPC_URI = process.env.BLAST_RPC_URI || '';
 const SEPOLIA_RPC_URI = process.env.SEPOLIA_RPC_URI || '';
-const BLAST_PRIVATE_KEY = process.env.MNEMONIC_BLAST || '';
+const BLAST_PRIVATE_KEY = process.env.BLAST_PRIVATE_KEY || '';
 const LOCAL_URI = 'http://localhost:8545';
 
 const BLASTSCAN_API_KEY = process.env.BLASTSCAN_API_KEY || '';
@@ -32,7 +32,7 @@ export default {
       url: BLAST_RPC_URI,
       chainId: 81457,
       accounts: [
-        ethers.Wallet.fromPhrase(BLAST_PRIVATE_KEY).privateKey,
+        Wallet.fromPhrase(BLAST_PRIVATE_KEY).privateKey
       ]
     },
   },
