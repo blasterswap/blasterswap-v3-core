@@ -2,6 +2,7 @@
 pragma solidity =0.7.6;
 
 import "./interfaces/IBlasterswapV3Factory.sol";
+import "./interfaces/IBlast.sol";
 
 import "./BlasterswapV3PoolDeployer.sol";
 import "./NoDelegateCall.sol";
@@ -25,10 +26,16 @@ contract BlasterswapV3Factory is
         public
         override getPool;
 
+    IBlast private constant BLAST =
+        IBlast(0x4300000000000000000000000000000000000002);
+
     constructor(address _pointsAdmin) {
         owner = msg.sender;
         admin = _pointsAdmin;
         emit OwnerChanged(address(0), msg.sender);
+
+        BLAST.configureClaimableGas();
+        BLAST.configureGovernor(admin);
 
         feeAmountTickSpacing[500] = 10;
         emit FeeAmountEnabled(500, 10);
