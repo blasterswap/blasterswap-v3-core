@@ -1,7 +1,12 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { pool } from '../typechain-types/interfaces';
 
-const ONE_BP_FEE = 100
-const ONE_BP_TICK_SPACING = 1
+const ONE_BP_FEE = 100;
+const ONE_BP_TICK_SPACING = 1;
+
+const gasRefundAddress = "0xba99b8a284f45447929a143dc2efa5bcfe7ade60";
+const wethAddress = "0x4300000000000000000000000000000000000004";
+const usdbAddress = "0x4300000000000000000000000000000000000003";
 
 const blastNetworkName = 'blast';
 
@@ -23,7 +28,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	console.log("Deploying factory...")
 	const v3CoreFactory = await deploy('BlasterswapV3Factory', {
 		from: deployer,
-		args: [deployer],
+		args: [gasRefundAddress],
 		log: true,
 		libraries: {
 			Oracle: oracleLibrary.address,
@@ -35,7 +40,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	const v3Factory = await ethers.getContractAt("BlasterswapV3Factory", v3CoreFactory.address);
 
 	console.log("Enabling fees and tick spacing...")
-	const tx = await v3Factory.enableFeeAmount(ONE_BP_FEE, ONE_BP_TICK_SPACING);
+	let tx = await v3Factory.enableFeeAmount(ONE_BP_FEE, ONE_BP_TICK_SPACING);
 	await tx.wait();
 	console.log("Enabling fees and tick spacing => Done")
 
@@ -51,6 +56,33 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 			log: true,
 		});
 	}
+
+	console.log("creating weth/usdb pool...");
+	tx = await v3Factory.createPool(
+		usdbAddress,
+		wethAddress,
+		3000
+	);
+
+	await tx.wait();
+
+	const poolCreatedFilter = v3Factory.filters.PoolCreated;
+	const poolCreatedEvent = await v3Factory.queryFilter(poolCreatedFilter);
+
+	const poolAddress = poolCreatedEvent[0].args.pool;
+
+	console.log(`Pool address: ${poolAddress}`);
+
+	const deployedPoolBytecode = await hre.ethers.provider.getCode(poolAddress);
+	const hash = ethers.solidityPackedKeccak256(
+		["bytes"], [deployedPoolBytecode]
+	)
+
+	console.log(`Pool's init code hash: ${hash}`);
+
+
+
+
 };
 
 module.exports.tags = ['Factory'];

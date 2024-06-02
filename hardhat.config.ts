@@ -14,10 +14,11 @@ import { resolve } from 'path';
 
 dotenvConfig({ path: resolve(__dirname, './.env') });
 
-const blastURI = process.env.BLAST_URI || '';
-const ethSepoliaURI = process.env.ETH_SEPOLIA_URI || '';
-const mnemonic = process.env.MNEMONIC || '';
-const localURI = 'http://localhost:8545';
+const blastURL = process.env.BLAST_RPC_URL || '';
+const ethSepoliaURL = process.env.SEPOLIA_RPC_URL || '';
+const localURL = 'http://localhost:8545';
+
+const mnemonic = process.env.BLAST_PRIVATE_KEY || '';
 
 const blastScanAPIKey = process.env.ETHERSCAN_API_KEY_BLAST || '';
 const ethSepoliaScanAPIKey = process.env.ETHERSCAN_API_KEY_ETH_SEPOLIA || '';
@@ -25,19 +26,19 @@ const ethSepoliaScanAPIKey = process.env.ETHERSCAN_API_KEY_ETH_SEPOLIA || '';
 export default {
   networks: {
     local: {
-      url: localURI,
+      url: localURL,
     },
     hardhat: {
       allowUnlimitedContractSize: false,
     },
     blast: {
-      url: blastURI,
+      url: blastURL,
       accounts: {
         mnemonic: mnemonic,
       },
     },
     ethSepolia: {
-      url: ethSepoliaURI,
+      url: ethSepoliaURL,
       accounts: {
         mnemonic: mnemonic,
       },
