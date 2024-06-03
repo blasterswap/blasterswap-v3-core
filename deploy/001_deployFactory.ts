@@ -79,10 +79,6 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	)
 
 	console.log(`Pool's init code hash: ${hash}`);
-
-
-
-
 };
 
 module.exports.tags = ['Factory'];
