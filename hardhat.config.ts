@@ -20,7 +20,7 @@ const localURL = 'http://localhost:8545';
 
 const mnemonic = process.env.BLAST_PRIVATE_KEY || '';
 
-const blastScanAPIKey = process.env.ETHERSCAN_API_KEY_BLAST || '';
+const blastScanAPIKey = process.env.BLASTSCAN_API_KEY || '';
 const ethSepoliaScanAPIKey = process.env.ETHERSCAN_API_KEY_ETH_SEPOLIA || '';
 
 export default {
@@ -57,7 +57,7 @@ export default {
     customChains: [
       {
         network: "blast",
-        chainId: 238,
+        chainId: 81457,
         urls: {
           apiURL: "https://api.blastscan.io/api",
           browserURL: "https://api.blastscan.io/api"
