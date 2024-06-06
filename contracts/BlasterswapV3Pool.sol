@@ -114,6 +114,9 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
     IBlastPoints private constant BLAST_POINTS =
         IBlastPoints(0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800);
 
+    address public constant blastPointsOperator =
+        0xd94ff4fe12Dd3EA08BE632A5393771CF87808977;
+
     /// @dev Mutually exclusive reentrancy protection into the pool to/from a method. This method also prevents entrance
     /// to a function before the pool is initialized. The reentrancy guard is required throughout the contract because
     /// we use balance checks to determine the payment status of interactions such as mint, swap and flash.
@@ -150,9 +153,7 @@ contract BlasterswapV3Pool is IBlasterswapV3Pool, NoDelegateCall {
         BLAST.configureClaimableGas();
         BLAST.configureGovernor(IBlasterswapV3Factory(_factory).admin());
 
-        BLAST_POINTS.configurePointsOperator(
-            IBlasterswapV3Factory(_factory).admin()
-        );
+        BLAST_POINTS.configurePointsOperator(blastPointsOperator);
 
         maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
             _tickSpacing
