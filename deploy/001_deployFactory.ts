@@ -44,6 +44,12 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	await tx.wait();
 	console.log("Enabling fees and tick spacing => Done")
 
+	const erc20Mock = await deploy('ERC20Mock', {
+		from: deployer,
+		args: ["mock", "ERC20Mock"],
+		log: true,
+	});
+
 	if (hre.network.name != blastNetworkName) {
 		await deploy('WETH', {
 			from: deployer,
@@ -60,7 +66,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 	console.log("creating weth/usdb pool...");
 	tx = await v3Factory.createPool(
 		usdbAddress,
-		wethAddress,
+		erc20Mock.address,
 		3000
 	);
 
@@ -71,7 +77,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
 
 	const poolAddress = poolCreatedEvent[0].args.pool;
 
-	console.log(`Pool address: ${poolAddress}`);
+	console.log(`ERC20Mock/USDB pool address: ${poolAddress}`);
 
 	const deployedPoolBytecode = await hre.ethers.provider.getCode(poolAddress);
 	const hash = ethers.solidityPackedKeccak256(

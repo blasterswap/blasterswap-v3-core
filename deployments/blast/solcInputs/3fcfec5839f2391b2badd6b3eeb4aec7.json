@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/mocks/ERC20Mock.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.7.6;\n\ncontract ERC20Mock {\n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(\n        address indexed owner,\n        address indexed spender,\n        uint256 value\n    );\n\n    uint256 public totalSupply;\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n    string public name;\n    string public symbol;\n    uint8 public decimals;\n\n    constructor(string memory _name, string memory _symbol) {\n        _mint(msg.sender, 10000000000000000000000000000000);\n    }\n\n    function transfer(\n        address recipient,\n        uint256 amount\n    ) external returns (bool) {\n        balanceOf[msg.sender] -= amount;\n        balanceOf[recipient] += amount;\n        emit Transfer(msg.sender, recipient, amount);\n        return true;\n    }\n\n    function approve(address spender, uint256 amount) external returns (bool) {\n        allowance[msg.sender][spender] = amount;\n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n\n    function transferFrom(\n        address sender,\n        address recipient,\n        uint256 amount\n    ) external returns (bool) {\n        allowance[sender][msg.sender] -= amount;\n        balanceOf[sender] -= amount;\n        balanceOf[recipient] += amount;\n        emit Transfer(sender, recipient, amount);\n        return true;\n    }\n\n    function _mint(address to, uint256 amount) internal {\n        balanceOf[to] += amount;\n        totalSupply += amount;\n        emit Transfer(address(0), to, amount);\n    }\n\n    function _burn(address from, uint256 amount) internal {\n        balanceOf[from] -= amount;\n        totalSupply -= amount;\n        emit Transfer(from, address(0), amount);\n    }\n\n    function mint(address to, uint256 amount) external {\n        _mint(to, amount);\n    }\n\n    function burn(address from, uint256 amount) external {\n        _burn(from, amount);\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 100
+    },
+    "metadata": {
+      "bytecodeHash": "none",
+      "useLiteralContent": true
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    }
+  }
+}
